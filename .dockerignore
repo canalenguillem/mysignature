@@ -1,0 +1,10 @@
+.git/
+.env
+docs/
+*.md
+node_modules/
+__pycache__/
+*.pyc
+dist/
+certs/
+nginx/ssl/

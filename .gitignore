@@ -1,0 +1,38 @@
+# ===== Entorno =====
+.env
+.env.local
+.env.*.local
+
+# ===== Python =====
+*.pyc
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# ===== Node / Frontend =====
+node_modules/
+dist/
+*.local
+
+# ===== Certificados / Secretos =====
+certs/
+nginx/ssl/
+*.pem
+*.key
+*.crt
+!nginx/conf.d/.gitkeep
+
+# ===== Docker override local (puertos específicos de cada máquina) =====
+docker-compose.override.yml
+
+# ===== IDE / OS =====
+.vscode/
+.idea/
+.DS_Store
+
+# ===== Logs =====
+*.log

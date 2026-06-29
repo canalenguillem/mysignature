@@ -1,0 +1,34 @@
+# ===== API / ASGI =====
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+python-multipart>=0.0.6
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
+# ===== Bases de datos =====
+SQLAlchemy>=2.0.25
+PyMySQL>=1.1.0
+alembic>=1.13.0
+pymongo>=4.6.0
+redis>=5.0.1
+
+# ===== Seguridad / JWT =====
+python-jose[cryptography]>=3.3.0
+passlib>=1.7.4
+
+# ===== Criptografía / Certificados (eIDAS) =====
+cryptography>=41.0.7
+pyopenssl>=23.3.0
+asn1crypto>=1.5.1
+
+# ===== PDF =====
+pypdf>=4.0.1
+
+# ===== HTTP client (TSA RFC 3161) =====
+httpx>=0.26.0
+requests>=2.31.0
+
+# ===== Testing =====
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-asyncio>=0.23.0

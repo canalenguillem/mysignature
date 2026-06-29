@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'IBM Plex Sans',system-ui,sans-serif;background:#dfe4ea;color:#0f172a;-webkit-font-smoothing:antialiased;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;}
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:6px;border:2px solid transparent;background-clip:content-box;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes pop{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+
+<div style="{{ outerStyle }}">
+
+<!-- ===================== LOGIN ===================== -->
+<sc-if value="{{ notAuthed }}" hint-placeholder-val="{{ true }}">
+<div style="flex:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;background:radial-gradient(120% 120% at 50% 0%, #eef2f9 0%, #dfe4ea 60%);">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:26px;">
+    <div style="width:40px;height:40px;border-radius:11px;background:#1d4ed8;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:22px;">✓</div>
+    <div style="font-weight:700;font-size:23px;letter-spacing:-0.02em;">mysignature</div>
+  </div>
+  <div style="width:440px;max-width:100%;background:#fff;border:1px solid #e2e8f0;border-radius:18px;box-shadow:0 12px 40px rgba(15,23,42,.10);overflow:hidden;">
+    <div style="padding:30px 30px 8px;text-align:center;">
+      <div style="width:56px;height:56px;border-radius:50%;background:#eff6ff;border:1px solid #bfdbfe;display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 14px;">🔒</div>
+      <div style="font-size:20px;font-weight:700;letter-spacing:-0.01em;">Identifícate con tu certificado</div>
+      <div style="font-size:13px;color:#64748b;margin-top:7px;line-height:1.55;">Accede de forma segura con tu certificado digital instalado en el navegador, como en la Sede Electrónica de la Agencia Tributaria.</div>
+    </div>
+    <div style="padding:22px 30px 14px;">
+      <button onClick="{{ openCertPicker }}" style="width:100%;background:#1d4ed8;color:#fff;padding:14px;border-radius:11px;font-size:14.5px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:9px;">🪪 Acceder con certificado digital</button>
+      <div style="display:flex;align-items:center;gap:10px;margin:18px 0;">
+        <div style="flex:1;height:1px;background:#e2e8f0;"></div>
+        <span style="font-size:11px;color:#94a3b8;font-weight:600;">MÉTODOS ADMITIDOS</span>
+        <div style="flex:1;height:1px;background:#e2e8f0;"></div>
+      </div>
+      <div style="display:flex;gap:9px;">
+        <div style="flex:1;border:1px solid #e2e8f0;border-radius:9px;padding:10px;text-align:center;font-size:11.5px;font-weight:600;color:#475569;">Certificado FNMT</div>
+        <div style="flex:1;border:1px solid #e2e8f0;border-radius:9px;padding:10px;text-align:center;font-size:11.5px;font-weight:600;color:#475569;">DNIe</div>
+        <div style="flex:1;border:1px solid #e2e8f0;border-radius:9px;padding:10px;text-align:center;font-size:11.5px;font-weight:600;color:#475569;">Cl@ve</div>
+      </div>
+    </div>
+    <div style="padding:14px 30px;background:#f8fafc;border-top:1px solid #f1f5f9;display:flex;align-items:center;justify-content:center;gap:8px;">
+      <span style="font-size:11.5px;color:#64748b;">🔐 Conexión segura</span>
+      <span style="width:3px;height:3px;border-radius:50%;background:#cbd5e1;"></span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#94a3b8;">eIDAS · @firma · UE 910/2014</span>
+    </div>
+  </div>
+  <div style="font-size:11.5px;color:#94a3b8;margin-top:20px;">Prototipo de demostración · sin datos reales</div>
+
+  <!-- CERT PICKER -->
+  <sc-if value="{{ certPicker }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;z-index:60;animation:fadeIn .16s ease;padding:24px;">
+    <div style="width:460px;max-width:100%;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.32);animation:pop .2s ease;">
+      <div style="padding:18px 20px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:18px;">🪪</span>
+        <div>
+          <div style="font-size:14.5px;font-weight:700;">Seleccionar un certificado</div>
+          <div style="font-size:12px;color:#64748b;margin-top:1px;">El sitio <b style="font-family:'IBM Plex Mono',monospace;">mysignature.es</b> solicita identificación.</div>
+        </div>
+      </div>
+      <div style="padding:16px 20px 6px;">
+        <sc-for list="{{ certs }}" as="c" hint-placeholder-count="2">
+          <div onClick="{{ c.pick }}" style="{{ c.rowStyle }}">
+            <div style="{{ c.dotStyle }}"><div style="{{ c.dotInner }}"></div></div>
+            <div style="width:32px;height:32px;border-radius:7px;background:#eff6ff;border:1px solid #bfdbfe;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;">🔖</div>
+            <div style="min-width:0;flex:1;">
+              <div style="font-size:13px;font-weight:700;">{{ c.cn }}</div>
+              <div style="font-size:11.5px;color:#64748b;">{{ c.issuer }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#94a3b8;margin-top:2px;">{{ c.detail }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex;gap:10px;padding:12px 20px 18px;">
+        <button onClick="{{ cancelCert }}" style="flex:1;background:#fff;border:1px solid #e2e8f0;color:#334155;padding:11px;border-radius:9px;font-size:13px;font-weight:600;">Cancelar</button>
+        <button onClick="{{ confirmCert }}" style="flex:1;background:#1d4ed8;color:#fff;padding:11px;border-radius:9px;font-size:13px;font-weight:700;">Aceptar</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ authed }}" hint-placeholder-val="{{ false }}">
+<div style="{{ shellStyle }}">
+
+  <!-- ===================== TOP BAR ===================== -->
+  <header style="height:60px;flex-shrink:0;background:#ffffff;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;padding:0 18px;gap:12px;z-index:5;">
+    <div style="display:flex;align-items:center;gap:11px;min-width:0;">
+      <div style="width:30px;height:30px;border-radius:8px;background:#1d4ed8;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:17px;flex-shrink:0;">✓</div>
+      <div style="font-weight:700;font-size:17px;letter-spacing:-0.02em;">mysignature</div>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#64748b;background:#f1f5f9;border:1px solid #e2e8f0;padding:2px 7px;border-radius:5px;">eIDAS · UE 910/2014</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="display:flex;background:#f1f5f9;border-radius:9px;padding:3px;border:1px solid #e2e8f0;">
+        <button onClick="{{ setDesktop }}" style="{{ deskTabStyle }}">Escritorio</button>
+        <button onClick="{{ setMobile }}" style="{{ mobTabStyle }}">Móvil</button>
+      </div>
+      <button onClick="{{ goProfile }}" title="Mi perfil" style="display:flex;align-items:center;gap:9px;padding:5px 11px 5px 7px;border:1px solid #e2e8f0;border-radius:999px;background:#fff;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;">JP</div>
+        <div style="line-height:1.15;text-align:left;">
+          <div style="font-size:12.5px;font-weight:600;">Juan Pérez García</div>
+          <div style="font-size:10.5px;color:#16a34a;font-weight:500;">● Certificado FNMT activo</div>
+        </div>
+      </button>
+      <button onClick="{{ logout }}" title="Cerrar sesión" style="width:34px;height:34px;border-radius:9px;border:1px solid #e2e8f0;background:#fff;color:#64748b;font-size:15px;">⏻</button>
+    </div>
+  </header>
+
+  <!-- ===================== BODY ===================== -->
+  <div style="{{ bodyRowStyle }}">
+
+    <!-- SIDEBAR -->
+    <aside style="{{ sidebarStyle }}">
+      <button onClick="{{ goUpload }}" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:#1d4ed8;color:#fff;padding:11px;border-radius:10px;font-size:13px;font-weight:700;margin-bottom:6px;flex-shrink:0;white-space:nowrap;">+ Subir documento</button>
+      <div style="{{ sidebarLabelStyle }}">Documentos</div>
+      <sc-for list="{{ docs }}" as="d" hint-placeholder-count="3">
+        <button onClick="{{ d.onClick }}" style="{{ d.style }}">
+          <div style="width:34px;height:42px;border-radius:5px;background:{{ d.iconBg }};border:1px solid {{ d.iconBorder }};flex-shrink:0;position:relative;display:flex;align-items:flex-end;justify-content:center;padding-bottom:5px;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:8px;color:{{ d.iconText }};font-weight:500;">PDF</span>
+          </div>
+          <div style="min-width:0;flex:1;text-align:left;">
+            <div style="font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ d.name }}</div>
+            <div style="display:flex;align-items:center;gap:5px;margin-top:3px;">
+              <span style="width:7px;height:7px;border-radius:50%;background:{{ d.statusColor }};flex-shrink:0;"></span>
+              <span style="font-size:11px;color:#64748b;">{{ d.status }}</span>
+            </div>
+          </div>
+        </button>
+      </sc-for>
+      <div style="height:1px;background:#eef2f6;margin:8px 4px;flex-shrink:0;"></div>
+      <button onClick="{{ goUsers }}" style="{{ navUsersStyle }}"><span style="font-size:15px;">👥</span> Buscar usuarios</button>
+      <button onClick="{{ goProfile }}" style="{{ navProfileStyle }}"><span style="font-size:15px;">⚙</span> Mi perfil</button>
+      <div style="margin-top:auto;padding:14px 6px 4px;border-top:1px solid #eef2f6;">
+        <div style="font-size:10.5px;color:#94a3b8;line-height:1.5;">Prototipo de demostración. Los documentos y certificados son ficticios.</div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main style="{{ mainStyle }}">
+
+      <!-- ===== FLOW 2: SIGN (locate) ===== -->
+      <sc-if value="{{ isSign }}" hint-placeholder-val="{{ true }}">
+      <div style="{{ contentRowStyle }}">
+        <!-- PDF PANE -->
+        <section style="{{ pdfPaneStyle }}">
+          <div style="height:48px;flex-shrink:0;background:#fff;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;padding:0 14px;gap:10px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="display:inline-flex;align-items:center;gap:6px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;padding:4px 9px;border-radius:7px;font-size:12px;font-weight:600;">✎ Dibuja el área de firma</span>
+              <span style="font-size:12px;color:#64748b;">Página {{ signPage }} de 6</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <button onClick="{{ zOut }}" style="width:30px;height:30px;border-radius:7px;border:1px solid #e2e8f0;background:#fff;color:#334155;font-size:16px;font-weight:600;">−</button>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#475569;min-width:42px;text-align:center;">{{ signZoomPct }}</span>
+              <button onClick="{{ zIn }}" style="width:30px;height:30px;border-radius:7px;border:1px solid #e2e8f0;background:#fff;color:#334155;font-size:16px;font-weight:600;">+</button>
+            </div>
+          </div>
+          <!-- canvas -->
+          <div style="flex:1;overflow:auto;background:#475569;display:flex;justify-content:center;padding:30px 20px;min-height:0;">
+            <div style="{{ pageWrapStyle }}">
+              <div onMouseDown="{{ onPageDown }}" onMouseMove="{{ onPageMove }}" onMouseUp="{{ onPageUp }}" onMouseLeave="{{ onPageUp }}" style="position:relative;width:560px;height:760px;background:#fff;box-shadow:0 8px 30px rgba(0,0,0,.28);cursor:crosshair;user-select:none;">
+                <!-- doc content -->
+                <div style="padding:54px 56px;pointer-events:none;">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#94a3b8;letter-spacing:0.08em;margin-bottom:26px;">ACUERDO_NDA_2026.PDF · CONFIDENCIAL</div>
+                  <div style="font-size:17px;font-weight:700;text-align:center;letter-spacing:-0.01em;margin-bottom:6px;">ACUERDO DE CONFIDENCIALIDAD</div>
+                  <div style="font-size:11px;color:#64748b;text-align:center;margin-bottom:26px;">entre Bufete García &amp; López S.L.P. y la Contraparte</div>
+                  <sc-for list="{{ bodyParas }}" as="p" hint-placeholder-count="6">
+                    <p style="font-size:10.5px;line-height:1.7;color:#334155;margin:0 0 13px;text-align:justify;">{{ p }}</p>
+                  </sc-for>
+                  <div style="margin-top:40px;display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;">
+                    <span>Bufete García &amp; López S.L.P.</span>
+                    <span>Página {{ signPage }}</span>
+                  </div>
+                </div>
+                <!-- drawn box -->
+                <div style="{{ boxStyle }}"></div>
+                <div style="{{ boxLabelStyle }}">{{ boxLabel }}</div>
+              </div>
+            </div>
+          </div>
+          <!-- footer actions -->
+          <div style="height:58px;flex-shrink:0;background:#fff;border-top:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;padding:0 16px;">
+            <button onClick="{{ clearBox }}" style="{{ clearBtnStyle }}">Limpiar selección</button>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <span style="font-size:11.5px;color:#94a3b8;">{{ coordsText }}</span>
+              <button onClick="{{ next }}" style="{{ nextBtnStyle }}">Siguiente →</button>
+            </div>
+          </div>
+        </section>
+        <!-- RIGHT PANE -->
+        <aside style="{{ rightPaneStyle }}">
+          <div style="padding:18px 18px 0;">
+            <div style="font-size:15px;font-weight:700;letter-spacing:-0.01em;">Resumen del documento</div>
+          </div>
+          <div style="padding:14px 18px;">
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:11px;padding:14px 15px;box-shadow:0 1px 2px rgba(15,23,42,.04);">
+              <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12.5px;"><span style="color:#64748b;">Archivo</span><span style="font-weight:600;">Acuerdo_NDA_2026.pdf</span></div>
+              <div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid #f1f5f9;font-size:12.5px;"><span style="color:#64748b;">Páginas</span><span style="font-weight:600;">6</span></div>
+              <div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid #f1f5f9;font-size:12.5px;"><span style="color:#64748b;">Tamaño</span><span style="font-weight:600;">248 KB</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-top:1px solid #f1f5f9;font-size:12.5px;"><span style="color:#64748b;">Estado</span><span style="display:inline-flex;align-items:center;gap:5px;color:#ea580c;font-weight:600;"><span style="width:7px;height:7px;border-radius:50%;background:#ea580c;"></span>Pendiente de firma</span></div>
+            </div>
+          </div>
+          <div style="padding:4px 18px 0;">
+            <div style="font-size:13px;font-weight:700;color:#475569;margin-bottom:9px;">Tu certificado</div>
+            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:11px;padding:14px 15px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                <div style="display:flex;align-items:center;gap:9px;">
+                  <div style="width:30px;height:30px;border-radius:7px;background:#16a34a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;">✓</div>
+                  <div style="font-weight:700;font-size:13px;">Certificado vigente</div>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;"><span style="color:#64748b;">Titular</span><span style="font-weight:600;">Juan Pérez García</span></div>
+              <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;"><span style="color:#64748b;">Organización</span><span style="font-weight:600;text-align:right;">Bufete García &amp; López</span></div>
+              <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;"><span style="color:#64748b;">Emisor</span><span style="font-weight:600;">AC FNMT Usuarios</span></div>
+              <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;"><span style="color:#64748b;">Válido hasta</span><span style="font-weight:600;">14/03/2027</span></div>
+              <div style="margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#16a34a;background:#dcfce7;padding:6px 8px;border-radius:6px;word-break:break-all;">SHA256 C4:D5:1A:77:2B:9E:60:3F:AA:01</div>
+            </div>
+          </div>
+        </aside>
+      </div>
+      </sc-if>
+
+      <!-- ===== FLOW 1 + 3: VIEWER ===== -->
+      <sc-if value="{{ isViewer }}" hint-placeholder-val="{{ true }}">
+      <div style="{{ contentRowStyle }}">
+        <!-- PDF PANE -->
+        <section style="{{ pdfPaneStyle }}">
+          <div style="height:48px;flex-shrink:0;background:#fff;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;padding:0 14px;gap:10px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <button onClick="{{ pgPrev }}" style="width:30px;height:30px;border-radius:7px;border:1px solid #e2e8f0;background:#fff;color:#334155;font-size:14px;">‹</button>
+              <span style="font-size:12px;color:#475569;min-width:74px;text-align:center;">Página {{ vpage }} de 6</span>
+              <button onClick="{{ pgNext }}" style="width:30px;height:30px;border-radius:7px;border:1px solid #e2e8f0;background:#fff;color:#334155;font-size:14px;">›</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <button onClick="{{ vzOut }}" style="width:30px;height:30px;border-radius:7px;border:1px solid #e2e8f0;background:#fff;color:#334155;font-size:16px;font-weight:600;">−</button>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#475569;min-width:42px;text-align:center;">{{ vZoomPct }}</span>
+              <button onClick="{{ vzIn }}" style="width:30px;height:30px;border-radius:7px;border:1px solid #e2e8f0;background:#fff;color:#334155;font-size:16px;font-weight:600;">+</button>
+              <button style="margin-left:6px;display:inline-flex;align-items:center;gap:6px;background:#1d4ed8;color:#fff;padding:7px 13px;border-radius:8px;font-size:12.5px;font-weight:600;">↓ Descargar PDF</button>
+            </div>
+          </div>
+          <div style="flex:1;overflow:auto;background:#475569;display:flex;justify-content:center;padding:30px 20px;min-height:0;">
+            <div style="{{ vPageWrapStyle }}">
+              <div style="position:relative;width:560px;height:760px;background:#fff;box-shadow:0 8px 30px rgba(0,0,0,.28);">
+                <div style="padding:54px 56px;">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#94a3b8;letter-spacing:0.08em;margin-bottom:26px;">{{ viewerDocCode }}</div>
+                  <div style="font-size:17px;font-weight:700;text-align:center;letter-spacing:-0.01em;margin-bottom:6px;">{{ viewerDocTitle }}</div>
+                  <div style="font-size:11px;color:#64748b;text-align:center;margin-bottom:26px;">entre Bufete García &amp; López S.L.P. y la Contraparte</div>
+                  <sc-for list="{{ bodyParas }}" as="p" hint-placeholder-count="6">
+                    <p style="font-size:10.5px;line-height:1.7;color:#334155;margin:0 0 13px;text-align:justify;">{{ p }}</p>
+                  </sc-for>
+                </div>
+                <!-- signature stamps -->
+                <sc-for list="{{ stamps }}" as="s" hint-placeholder-count="0">
+                  <div style="{{ s.style }}">
+                    <div style="display:flex;align-items:center;gap:5px;margin-bottom:3px;">
+                      <span style="width:15px;height:15px;border-radius:50%;background:#16a34a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;">✓</span>
+                      <span style="font-size:9.5px;font-weight:700;color:#166534;">Firmado digitalmente</span>
+                    </div>
+                    <div style="font-size:11px;font-weight:600;color:#14532d;">{{ s.name }}</div>
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:7.5px;color:#16a34a;margin-top:2px;">{{ s.date }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- RIGHT PANE: VERIFY (flow 1) -->
+        <sc-if value="{{ isVerify }}" hint-placeholder-val="{{ true }}">
+        <aside style="{{ rightPaneStyle }}">
+          <div style="padding:16px 18px 0;">
+            <div style="font-size:15px;font-weight:700;letter-spacing:-0.01em;">Verificación de firmas</div>
+            <div style="display:inline-flex;align-items:center;gap:6px;margin-top:8px;background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;padding:5px 10px;border-radius:7px;font-size:12px;font-weight:600;">✓ Documento válido · 2 firmas verificadas</div>
+            <!-- tabs -->
+            <div style="display:flex;gap:4px;margin-top:14px;border-bottom:1px solid #e2e8f0;">
+              <button onClick="{{ tabFirmas }}" style="{{ tabFirmasStyle }}">Firmas</button>
+              <button onClick="{{ tabAudit }}" style="{{ tabAuditStyle }}">Historial de auditoría</button>
+            </div>
+          </div>
+
+          <!-- FIRMAS TAB -->
+          <sc-if value="{{ isFirmasTab }}" hint-placeholder-val="{{ true }}">
+          <div style="flex:1;overflow:auto;padding:14px 18px 20px;min-height:0;">
+            <sc-for list="{{ verifySignatures }}" as="s" hint-placeholder-count="2">
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:11px;padding:14px;margin-bottom:12px;box-shadow:0 1px 2px rgba(15,23,42,.04);">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+                  <div style="display:flex;align-items:center;gap:9px;min-width:0;">
+                    <div style="width:34px;height:34px;border-radius:50%;background:{{ s.avatarBg }};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;flex-shrink:0;">{{ s.initials }}</div>
+                    <div style="min-width:0;">
+                      <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ s.name }}</div>
+                      <div style="font-size:11px;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ s.email }}</div>
+                    </div>
+                  </div>
+                  <span style="display:inline-flex;align-items:center;gap:4px;background:#dcfce7;color:#15803d;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:600;flex-shrink:0;white-space:nowrap;">✓ Válida</span>
+                </div>
+                <div style="margin-top:11px;display:flex;flex-direction:column;gap:7px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;"><span style="color:#64748b;">Fecha de firma</span><span style="font-weight:600;">{{ s.date }}</span></div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;"><span style="color:#64748b;">Sello TSA</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1d4ed8;">{{ s.tsa }}</span></div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;"><span style="color:#64748b;">Huella (SHA-256)</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#475569;">{{ s.fp }}…</span></div>
+                </div>
+                <button onClick="{{ s.toggle }}" style="margin-top:11px;width:100%;display:flex;align-items:center;justify-content:center;gap:6px;background:#f8fafc;border:1px solid #e2e8f0;color:#1d4ed8;padding:8px;border-radius:8px;font-size:12px;font-weight:600;">{{ s.toggleLabel }}</button>
+                <sc-if value="{{ s.open }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:10px;padding-top:11px;border-top:1px dashed #e2e8f0;display:flex;flex-direction:column;gap:7px;animation:fadeIn .2s ease;">
+                  <div style="display:flex;justify-content:space-between;font-size:11.5px;"><span style="color:#64748b;">Emisor</span><span style="font-weight:600;">{{ s.issuer }}</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11.5px;"><span style="color:#64748b;">Nº de serie</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;">{{ s.serial }}</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11.5px;"><span style="color:#64748b;">Tipo de firma</span><span style="font-weight:600;">Cualificada (QES)</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11.5px;"><span style="color:#64748b;">Válido hasta</span><span style="font-weight:600;">{{ s.valid }}</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11.5px;"><span style="color:#64748b;">Autoridad TSA</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1d4ed8;">tsa.izenpe.com</span></div>
+                </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+          </sc-if>
+
+          <!-- AUDIT TAB -->
+          <sc-if value="{{ isAuditTab }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;display:flex;flex-direction:column;min-height:0;">
+            <div style="display:flex;gap:6px;padding:12px 18px 10px;flex-wrap:wrap;">
+              <sc-for list="{{ auditChips }}" as="c" hint-placeholder-count="3">
+                <button onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</button>
+              </sc-for>
+            </div>
+            <div style="flex:1;overflow:auto;padding:0 18px 20px;min-height:0;">
+              <sc-for list="{{ auditRows }}" as="r" hint-placeholder-count="6">
+                <div style="display:flex;gap:11px;padding:11px 0;border-bottom:1px solid #f1f5f9;">
+                  <div style="width:26px;height:26px;border-radius:50%;background:{{ r.iconBg }};color:{{ r.iconColor }};display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">{{ r.icon }}</div>
+                  <div style="min-width:0;flex:1;">
+                    <div style="font-size:12.5px;font-weight:600;">{{ r.event }}</div>
+                    <div style="font-size:11px;color:#64748b;margin-top:1px;">{{ r.actor }}</div>
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#94a3b8;margin-top:3px;">{{ r.time }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          </sc-if>
+        </aside>
+        </sc-if>
+
+        <!-- RIGHT PANE: MULTI (flow 3) -->
+        <sc-if value="{{ isMulti }}" hint-placeholder-val="{{ false }}">
+        <aside style="{{ rightPaneStyle }}">
+          <div style="padding:16px 18px 0;">
+            <div style="display:flex;background:#f1f5f9;border-radius:9px;padding:3px;border:1px solid #e2e8f0;margin-bottom:14px;">
+              <button onClick="{{ setParallel }}" style="{{ parTabStyle }}">Paralela</button>
+              <button onClick="{{ setSequential }}" style="{{ seqTabStyle }}">Secuencial</button>
+            </div>
+            <div style="font-size:15px;font-weight:700;letter-spacing:-0.01em;">{{ multiTitle }}</div>
+            <div style="font-size:12px;color:#64748b;margin-top:4px;">{{ multiSubtitle }}</div>
+          </div>
+          <div style="flex:1;overflow:auto;padding:16px 18px 20px;min-height:0;">
+            <sc-for list="{{ multiSigners }}" as="s" hint-placeholder-count="2">
+              <div style="position:relative;padding-left:30px;padding-bottom:16px;">
+                <sc-if value="{{ s.showLine }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:12px;top:26px;bottom:0;width:2px;background:#e2e8f0;"></div></sc-if>
+                <div style="position:absolute;left:0;top:1px;width:25px;height:25px;border-radius:50%;background:{{ s.dotBg }};color:{{ s.dotColor }};border:2px solid {{ s.dotBorder }};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">{{ s.dotIcon }}</div>
+                <div style="background:{{ s.cardBg }};border:1px solid {{ s.cardBorder }};border-radius:11px;padding:13px 14px;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                    <div style="font-size:13px;font-weight:700;">{{ s.name }}</div>
+                    <span style="{{ s.badgeStyle }}">{{ s.badge }}</span>
+                  </div>
+                  <div style="font-size:11.5px;color:#64748b;margin-top:3px;">{{ s.sub }}</div>
+                  <sc-if value="{{ s.canSign }}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{ signAsCarlos }}" style="margin-top:11px;width:100%;background:#1d4ed8;color:#fff;padding:9px;border-radius:8px;font-size:12.5px;font-weight:600;">Firmar ahora</button>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-for>
+            <div style="{{ multiMsgStyle }}">{{ multiMsg }}</div>
+          </div>
+        </aside>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <!-- ===== UPLOAD ===== -->
+      <sc-if value="{{ isUpload }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1;overflow:auto;min-width:0;display:flex;justify-content:center;padding:36px 24px;">
+        <div style="width:640px;max-width:100%;">
+          <div style="font-size:20px;font-weight:700;letter-spacing:-0.01em;">Subir documento</div>
+          <div style="font-size:13px;color:#64748b;margin-top:5px;">Sube el PDF que quieres firmar o enviar a firmar. Formato admitido: PDF (máx. 25 MB).</div>
+
+          <sc-if value="{{ uploadEmpty }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ pickFile }}" style="width:100%;margin-top:22px;border:2px dashed #bfdbfe;background:#f8faff;border-radius:16px;padding:54px 24px;display:flex;flex-direction:column;align-items:center;gap:12px;cursor:pointer;" style-hover="background:#eff6ff;border-color:#1d4ed8;">
+            <div style="width:60px;height:60px;border-radius:50%;background:#eff6ff;display:flex;align-items:center;justify-content:center;font-size:28px;">⬆</div>
+            <div style="font-size:15px;font-weight:700;color:#1d4ed8;">Arrastra tu PDF aquí o haz clic para buscar</div>
+            <div style="font-size:12px;color:#94a3b8;">También puedes seleccionarlo desde tu equipo</div>
+          </button>
+          <div style="display:flex;gap:12px;margin-top:18px;">
+            <div style="flex:1;background:#fff;border:1px solid #e2e8f0;border-radius:11px;padding:14px;"><div style="font-size:18px;">🔒</div><div style="font-size:12.5px;font-weight:700;margin-top:6px;">Cifrado en tránsito</div><div style="font-size:11.5px;color:#64748b;margin-top:2px;">Tus archivos viajan por conexión segura TLS.</div></div>
+            <div style="flex:1;background:#fff;border:1px solid #e2e8f0;border-radius:11px;padding:14px;"><div style="font-size:18px;">🇪🇸</div><div style="font-size:12.5px;font-weight:700;margin-top:6px;">Conforme a eIDAS</div><div style="font-size:11.5px;color:#64748b;margin-top:2px;">Firma avanzada y cualificada con sello TSA.</div></div>
+          </div>
+          </sc-if>
+
+          <sc-if value="{{ uploadReady }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:22px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 2px rgba(15,23,42,.04);">
+            <div style="display:flex;align-items:center;gap:14px;">
+              <div style="width:46px;height:58px;border-radius:7px;background:#fff7ed;border:1px solid #fed7aa;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px;flex-shrink:0;"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#ea580c;font-weight:600;">PDF</span></div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:14px;font-weight:700;">Acuerdo_NDA_2026.pdf</div>
+                <div style="font-size:12px;color:#64748b;margin-top:2px;">6 páginas · 248 KB · subido correctamente</div>
+                <div style="height:5px;background:#dcfce7;border-radius:99px;margin-top:8px;overflow:hidden;"><div style="height:100%;width:100%;background:#16a34a;border-radius:99px;"></div></div>
+              </div>
+              <button onClick="{{ resetUpload }}" style="width:32px;height:32px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#64748b;font-size:15px;flex-shrink:0;">✕</button>
+            </div>
+          </div>
+          <div style="margin-top:16px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;">
+            <div style="font-size:13.5px;font-weight:700;margin-bottom:10px;">¿Qué quieres hacer?</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:flex-start;gap:11px;border:1.5px solid #1d4ed8;background:#eff6ff;border-radius:10px;padding:12px 13px;"><span style="font-size:16px;">✍</span><div><div style="font-size:13px;font-weight:700;color:#1e40af;">Firmar yo mismo</div><div style="font-size:11.5px;color:#475569;">Dibuja tu firma sobre el documento y fírmalo ahora.</div></div></div>
+              <button onClick="{{ goUsers }}" style="text-align:left;display:flex;align-items:flex-start;gap:11px;border:1px solid #e2e8f0;background:#fff;border-radius:10px;padding:12px 13px;"><span style="font-size:16px;">👥</span><div><div style="font-size:13px;font-weight:700;">Enviar a firmar a otros</div><div style="font-size:11.5px;color:#64748b;">Añade firmantes y elige orden paralelo o secuencial.</div></div></button>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px;">
+            <button onClick="{{ resetUpload }}" style="background:#fff;border:1px solid #e2e8f0;color:#334155;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:600;">Cancelar</button>
+            <button onClick="{{ uploadContinue }}" style="background:#1d4ed8;color:#fff;padding:11px 22px;border-radius:10px;font-size:13px;font-weight:700;">Continuar a firmar →</button>
+          </div>
+          </sc-if>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== USERS ===== -->
+      <sc-if value="{{ isUsers }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1;overflow:auto;min-width:0;display:flex;justify-content:center;padding:36px 24px;">
+        <div style="width:680px;max-width:100%;">
+          <div style="font-size:20px;font-weight:700;letter-spacing:-0.01em;">Firmantes del documento</div>
+          <div style="font-size:13px;color:#64748b;margin-top:5px;">Busca y añade las personas que deben firmar <b>Acuerdo_NDA_2026.pdf</b>.</div>
+
+          <div style="position:relative;margin-top:18px;">
+            <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:14px;color:#94a3b8;">🔍</span>
+            <input value="{{ userSearch }}" onChange="{{ onUserSearch }}" placeholder="Buscar por nombre o correo…" style="width:100%;padding:13px 14px 13px 40px;border:1px solid #e2e8f0;border-radius:11px;font-size:13.5px;font-family:'IBM Plex Sans',sans-serif;background:#fff;outline:none;" style-focus="border-color:#1d4ed8;box-shadow:0 0 0 3px rgba(29,78,216,.12);" />
+          </div>
+
+          <div style="margin-top:16px;background:#f8faff;border:1px solid #e2e8f0;border-radius:12px;padding:14px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+              <div style="font-size:12.5px;font-weight:700;color:#475569;">Firmantes seleccionados ({{ selectedCount }})</div>
+              <div style="display:flex;background:#eef2f7;border-radius:9px;padding:3px;border:1px solid #e2e8f0;">
+                <button onClick="{{ setUsersParallel }}" style="{{ usersParStyle }}">Paralela</button>
+                <button onClick="{{ setUsersSequential }}" style="{{ usersSeqStyle }}">Secuencial</button>
+              </div>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:11px;">
+              <sc-for list="{{ selectedUsers }}" as="u" hint-placeholder-count="1">
+                <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e2e8f0;border-radius:999px;padding:5px 6px 5px 5px;">
+                  <span style="width:24px;height:24px;border-radius:50%;background:{{ u.bg }};color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;">{{ u.initials }}</span>
+                  <span style="font-size:12px;font-weight:600;">{{ u.order }}. {{ u.name }}</span>
+                  <button onClick="{{ u.remove }}" style="width:18px;height:18px;border-radius:50%;background:#f1f5f9;color:#64748b;font-size:11px;display:flex;align-items:center;justify-content:center;">✕</button>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="margin-top:18px;display:flex;flex-direction:column;gap:8px;">
+            <sc-for list="{{ userRows }}" as="u" hint-placeholder-count="5">
+              <div style="display:flex;align-items:center;gap:13px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;">
+                <div style="width:40px;height:40px;border-radius:50%;background:{{ u.bg }};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;flex-shrink:0;">{{ u.initials }}</div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:13.5px;font-weight:700;">{{ u.name }}</div>
+                  <div style="font-size:11.5px;color:#64748b;">{{ u.role }} · {{ u.email }}</div>
+                </div>
+                <button onClick="{{ u.toggle }}" style="{{ u.btnStyle }}">{{ u.btnLabel }}</button>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;">
+            <button onClick="{{ goUpload }}" style="background:#fff;border:1px solid #e2e8f0;color:#334155;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:600;">Atrás</button>
+            <button onClick="{{ uploadContinue }}" style="background:#1d4ed8;color:#fff;padding:11px 22px;border-radius:10px;font-size:13px;font-weight:700;">Enviar solicitud de firma →</button>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== PROFILE ===== -->
+      <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1;overflow:auto;min-width:0;display:flex;justify-content:center;padding:36px 24px;">
+        <div style="width:680px;max-width:100%;">
+          <div style="display:flex;align-items:center;gap:16px;">
+            <div style="width:64px;height:64px;border-radius:50%;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:24px;flex-shrink:0;">JP</div>
+            <div>
+              <div style="font-size:20px;font-weight:700;letter-spacing:-0.01em;">Juan Pérez García</div>
+              <div style="font-size:13px;color:#64748b;">Abogado · Bufete García &amp; López S.L.P.</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:6px;margin-top:20px;border-bottom:1px solid #e2e8f0;">
+            <button onClick="{{ tabPerfil }}" style="{{ profTabPerfilStyle }}">Perfil</button>
+            <button onClick="{{ tabCert }}" style="{{ profTabCertStyle }}">Certificado</button>
+            <button onClick="{{ tabPref }}" style="{{ profTabPrefStyle }}">Preferencias</button>
+          </div>
+
+          <!-- PERFIL -->
+          <sc-if value="{{ isProfTabPerfil }}" hint-placeholder-val="{{ true }}">
+          <div style="margin-top:18px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:6px 18px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid #f1f5f9;"><span style="font-size:12.5px;color:#64748b;">Nombre completo</span><span style="font-size:13px;font-weight:600;">Juan Pérez García</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid #f1f5f9;"><span style="font-size:12.5px;color:#64748b;">NIF</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:500;">12345678Z</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid #f1f5f9;"><span style="font-size:12.5px;color:#64748b;">Correo electrónico</span><span style="font-size:13px;font-weight:600;">juan.perez@bufetegl.es</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid #f1f5f9;"><span style="font-size:12.5px;color:#64748b;">Organización</span><span style="font-size:13px;font-weight:600;">Bufete García &amp; López S.L.P.</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 0;"><span style="font-size:12.5px;color:#64748b;">Teléfono</span><span style="font-size:13px;font-weight:600;">+34 600 123 456</span></div>
+          </div>
+          <button style="margin-top:14px;background:#fff;border:1px solid #e2e8f0;color:#1d4ed8;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;">Editar datos</button>
+          </sc-if>
+
+          <!-- CERTIFICADO -->
+          <sc-if value="{{ isProfTabCert }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:18px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:14px;padding:18px;">
+            <div style="display:flex;align-items:center;gap:11px;margin-bottom:14px;">
+              <div style="width:38px;height:38px;border-radius:9px;background:#16a34a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;">✓</div>
+              <div><div style="font-size:14.5px;font-weight:700;">Certificado vigente</div><div style="font-size:12px;color:#15803d;">Quedan 261 días de validez</div></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:7px 0;font-size:12.5px;"><span style="color:#475569;">Titular</span><span style="font-weight:600;">Juan Pérez García</span></div>
+            <div style="display:flex;justify-content:space-between;padding:7px 0;font-size:12.5px;"><span style="color:#475569;">Emisor</span><span style="font-weight:600;">AC FNMT Usuarios</span></div>
+            <div style="display:flex;justify-content:space-between;padding:7px 0;font-size:12.5px;"><span style="color:#475569;">Tipo</span><span style="font-weight:600;">Cualificado de firma (QES)</span></div>
+            <div style="display:flex;justify-content:space-between;padding:7px 0;font-size:12.5px;"><span style="color:#475569;">Válido hasta</span><span style="font-weight:600;">14/03/2027</span></div>
+            <div style="display:flex;justify-content:space-between;padding:7px 0;font-size:12.5px;"><span style="color:#475569;">Nº de serie</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;">7B:0D:3E:21:54:F2</span></div>
+            <div style="margin-top:10px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#16a34a;background:#dcfce7;padding:8px 10px;border-radius:7px;word-break:break-all;">SHA256 C4:D5:1A:77:2B:9E:60:3F:AA:01:8C:4D:E2:90:11:7F</div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:14px;">
+            <button style="background:#fff;border:1px solid #e2e8f0;color:#1d4ed8;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;">Renovar certificado</button>
+            <button style="background:#fff;border:1px solid #fecaca;color:#dc2626;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;">Revocar</button>
+          </div>
+          </sc-if>
+
+          <!-- PREFERENCIAS -->
+          <sc-if value="{{ isProfTabPref }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:18px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;">
+            <div style="font-size:13px;font-weight:700;margin-bottom:10px;">Tipo de firma por defecto</div>
+            <div style="display:flex;gap:9px;">
+              <button onClick="{{ setPrefAvanzada }}" style="{{ sigAvanzadaPrefStyle }}">Avanzada (AES)</button>
+              <button onClick="{{ setPrefCual }}" style="{{ sigCualPrefStyle }}">Cualificada (QES)</button>
+            </div>
+            <div style="font-size:13px;font-weight:700;margin:18px 0 10px;">Idioma de la interfaz</div>
+            <div style="display:flex;gap:9px;">
+              <button onClick="{{ setLangEs }}" style="{{ langEsStyle }}">Español</button>
+              <button onClick="{{ setLangCa }}" style="{{ langCaStyle }}">Català</button>
+              <button onClick="{{ setLangEn }}" style="{{ langEnStyle }}">English</button>
+            </div>
+          </div>
+          <div style="margin-top:14px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:6px 18px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #f1f5f9;">
+              <div><div style="font-size:13px;font-weight:600;">Avisos por correo</div><div style="font-size:11.5px;color:#64748b;">Cuando un documento se firma o requiere tu firma.</div></div>
+              <button onClick="{{ toggleEmail }}" style="{{ emailSwStyle }}"><span style="{{ emailKnobStyle }}"></span></button>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;">
+              <div><div style="font-size:13px;font-weight:600;">Avisos por SMS</div><div style="font-size:11.5px;color:#64748b;">Alertas críticas en tu móvil.</div></div>
+              <button onClick="{{ toggleSms }}" style="{{ smsSwStyle }}"><span style="{{ smsKnobStyle }}"></span></button>
+            </div>
+          </div>
+          <div style="margin-top:14px;display:flex;align-items:center;gap:9px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 14px;font-size:12px;color:#1e40af;">
+            <span style="font-size:14px;">🕑</span><span>Autoridad de sellado de tiempo (TSA): <b style="font-family:'IBM Plex Mono',monospace;">tsa.izenpe.com</b></span>
+          </div>
+          </sc-if>
+        </div>
+      </div>
+      </sc-if>
+
+    </main>
+  </div>
+
+  <!-- ===================== MODALS ===================== -->
+  <!-- REVIEW -->
+  <sc-if value="{{ isReview }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;background:rgba(15,23,42,.62);display:flex;align-items:center;justify-content:center;z-index:40;animation:fadeIn .18s ease;padding:24px;">
+    <div style="width:440px;max-width:100%;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.3);animation:pop .22s ease;">
+      <div style="padding:20px 22px 16px;border-bottom:1px solid #f1f5f9;">
+        <div style="font-size:17px;font-weight:700;letter-spacing:-0.01em;">Resumen de firma</div>
+        <div style="font-size:12.5px;color:#64748b;margin-top:3px;">Revisa los datos antes de firmar el documento.</div>
+      </div>
+      <div style="padding:8px 22px 4px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9;font-size:13px;"><span style="color:#64748b;">Documento</span><span style="font-weight:600;">Acuerdo_NDA_2026.pdf</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9;font-size:13px;"><span style="color:#64748b;">Firmante</span><span style="font-weight:600;">Juan Pérez García</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9;font-size:13px;"><span style="color:#64748b;">Ubicación</span><span style="font-weight:600;">Página {{ signPage }} · {{ posLabel }}</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9;font-size:13px;"><span style="color:#64748b;">Posición</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;">{{ coordsText }}</span></div>
+        <div style="padding:12px 0 6px;font-size:13px;">
+          <div style="color:#64748b;margin-bottom:8px;">Tipo de firma</div>
+          <div style="display:flex;gap:8px;">
+            <button onClick="{{ setSigAvanzada }}" style="{{ avanzadaStyle }}">Avanzada (AES)</button>
+            <button onClick="{{ setSigCualificada }}" style="{{ cualificadaStyle }}">Cualificada (QES)</button>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:9px;padding:10px 12px;margin:6px 0 4px;font-size:12px;color:#1e40af;">
+          <span style="font-size:14px;">🕑</span><span>Se añadirá automáticamente un sello de tiempo cualificado (TSA).</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;padding:14px 22px 20px;">
+        <button onClick="{{ cancelReview }}" style="flex:1;background:#fff;border:1px solid #e2e8f0;color:#334155;padding:12px;border-radius:10px;font-size:13.5px;font-weight:600;">Cancelar</button>
+        <button onClick="{{ confirmSign }}" style="flex:2;background:#1d4ed8;color:#fff;padding:12px;border-radius:10px;font-size:13.5px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:7px;">🔏 Firmar ahora</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- PROCESSING -->
+  <sc-if value="{{ isProcessing }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;background:rgba(15,23,42,.62);display:flex;align-items:center;justify-content:center;z-index:40;animation:fadeIn .18s ease;padding:24px;">
+    <div style="width:400px;max-width:100%;background:#fff;border-radius:16px;padding:26px 24px 22px;box-shadow:0 24px 60px rgba(0,0,0,.3);animation:pop .22s ease;">
+      <div style="font-size:17px;font-weight:700;text-align:center;letter-spacing:-0.01em;">Procesando firma…</div>
+      <div style="font-size:12.5px;color:#64748b;text-align:center;margin-top:4px;">No cierres esta ventana.</div>
+      <div style="height:6px;background:#f1f5f9;border-radius:99px;margin:18px 0 20px;overflow:hidden;">
+        <div style="{{ progressStyle }}"></div>
+      </div>
+      <sc-for list="{{ procView }}" as="p" hint-placeholder-count="3">
+        <div style="display:flex;align-items:center;gap:12px;padding:9px 0;">
+          <div style="{{ p.iconStyle }}">
+            <sc-if value="{{ p.done }}" hint-placeholder-val="{{ false }}"><span>✓</span></sc-if>
+            <sc-if value="{{ p.active }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;width:14px;height:14px;border:2px solid #bfdbfe;border-top-color:#1d4ed8;border-radius:50%;animation:spin .7s linear infinite;"></span></sc-if>
+            <sc-if value="{{ p.pending }}" hint-placeholder-val="{{ true }}"><span style="width:8px;height:8px;border-radius:50%;background:#cbd5e1;"></span></sc-if>
+          </div>
+          <span style="{{ p.labelStyle }}">{{ p.label }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- SUCCESS -->
+  <sc-if value="{{ isSuccess }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;background:rgba(15,23,42,.62);display:flex;align-items:center;justify-content:center;z-index:40;animation:fadeIn .18s ease;padding:24px;">
+    <div style="width:430px;max-width:100%;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.3);animation:pop .22s ease;">
+      <div style="background:#f0fdf4;padding:28px 24px 22px;text-align:center;border-bottom:1px solid #dcfce7;">
+        <div style="width:58px;height:58px;border-radius:50%;background:#16a34a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 12px;box-shadow:0 6px 18px rgba(22,163,74,.35);">✓</div>
+        <div style="font-size:18px;font-weight:700;letter-spacing:-0.01em;">Documento firmado correctamente</div>
+        <div style="font-size:12.5px;color:#15803d;margin-top:4px;">Firma cualificada (QES) registrada y sellada.</div>
+      </div>
+      <div style="padding:16px 22px 6px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #f1f5f9;font-size:13px;"><span style="color:#64748b;">Fecha y hora</span><span style="font-weight:600;">{{ signedAtStr }}</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #f1f5f9;font-size:13px;"><span style="color:#64748b;">Sello de tiempo TSA</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1d4ed8;">{{ signedTsaStr }}</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;font-size:13px;"><span style="color:#64748b;">Autoridad TSA</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1d4ed8;">tsa.izenpe.com</span></div>
+      </div>
+      <div style="display:flex;gap:10px;padding:14px 22px 20px;">
+        <button onClick="{{ backToDoc }}" style="flex:1;background:#fff;border:1px solid #e2e8f0;color:#334155;padding:12px;border-radius:10px;font-size:13.5px;font-weight:600;">Volver al documento</button>
+        <button onClick="{{ viewSigned }}" style="flex:1;background:#1d4ed8;color:#fff;padding:12px;border-radius:10px;font-size:13.5px;font-weight:700;">Ver PDF firmado</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    view: 'desktop',
+    activeDoc: 'sign',
+    signStep: 'locate',
+    box: null, drawing: false, dragStart: null,
+    signZoom: 1, signPage: 1, sigType: 'cualificada',
+    procStep: 0, signedAt: null,
+    zoom: 1, vpage: 1, rightTab: 'firmas', expanded: null,
+    auditFilter: 'todos',
+    multiMode: 'parallel', carlosSigned: false,
+    juanSigned: false,
+    authed: false, certPicker: false, selectedCert: 0,
+    screen: 'doc',
+    uploadState: 'empty',
+    userSearch: '', selectedSigners: ['u1'], signMode: 'parallel',
+    profileTab: 'perfil',
+    defaultSigType: 'cualificada', lang: 'es', notifEmail: true, notifSms: false,
+  };
+
+  PAGE_W = 560; PAGE_H = 760; MIN_W = 100; MIN_H = 40;
+
+  setView(v) { this.setState({ view: v }); }
+  go(doc) { this.setState({ activeDoc: doc, signStep: 'locate', screen: 'doc' }); }
+  goScreen(s) { this.setState({ screen: s }); }
+  // auth
+  openCertPicker() { this.setState({ certPicker: true }); }
+  pickCert(i) { this.setState({ selectedCert: i }); }
+  confirmCert() { this.setState({ authed: true, certPicker: false }); }
+  cancelCert() { this.setState({ certPicker: false }); }
+  logout() { this.setState({ authed: false, screen: 'doc', certPicker: false }); }
+  // upload
+  pickFile() { this.setState({ uploadState: 'ready' }); }
+  resetUpload() { this.setState({ uploadState: 'empty' }); }
+  uploadContinue() { this.setState({ screen: 'doc', activeDoc: 'sign', signStep: 'locate' }); }
+  // users
+  setUserSearch(v) { this.setState({ userSearch: v }); }
+  toggleSigner(id) { this.setState(s => ({ selectedSigners: s.selectedSigners.includes(id) ? s.selectedSigners.filter(x => x !== id) : [...s.selectedSigners, id] })); }
+  setSignMode(m) { this.setState({ signMode: m }); }
+  // profile
+  setProfileTab(t) { this.setState({ profileTab: t }); }
+  setDefaultSig(t) { this.setState({ defaultSigType: t }); }
+  setLang(l) { this.setState({ lang: l }); }
+  toggleNotif(k) { this.setState(s => ({ [k]: !s[k] })); }
+
+  clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+  relCoords(e) {
+    const r = e.currentTarget.getBoundingClientRect();
+    const z = this.state.signZoom;
+    return { x: (e.clientX - r.left) / z, y: (e.clientY - r.top) / z };
+  }
+  onPageDown(e) {
+    if (this.state.signStep !== 'locate') return;
+    const p = this.relCoords(e);
+    this.setState({ drawing: true, dragStart: p, box: { x: p.x, y: p.y, w: 0, h: 0 } });
+    e.preventDefault();
+  }
+  onPageMove(e) {
+    if (!this.state.drawing) return;
+    const p = this.relCoords(e), s = this.state.dragStart;
+    let x = Math.min(s.x, p.x), y = Math.min(s.y, p.y);
+    x = this.clamp(x, 0, this.PAGE_W); y = this.clamp(y, 0, this.PAGE_H);
+    let w = Math.abs(p.x - s.x), h = Math.abs(p.y - s.y);
+    w = Math.min(w, this.PAGE_W - x); h = Math.min(h, this.PAGE_H - y);
+    this.setState({ box: { x, y, w, h } });
+  }
+  endDraw() {
+    if (!this.state.drawing) return;
+    let b = this.state.box;
+    if (b) {
+      let w = Math.max(b.w, this.MIN_W), h = Math.max(b.h, this.MIN_H);
+      let x = Math.min(b.x, this.PAGE_W - w), y = Math.min(b.y, this.PAGE_H - h);
+      b = { x: Math.max(0, x), y: Math.max(0, y), w, h };
+    }
+    this.setState({ drawing: false, box: b });
+  }
+  clearBox() { this.setState({ box: null }); }
+  next() { if (this.state.box) this.setState({ signStep: 'review' }); }
+  cancelReview() { this.setState({ signStep: 'locate' }); }
+  confirmSign() {
+    this.setState({ signStep: 'processing', procStep: 0 });
+    this._t = [
+      setTimeout(() => this.setState({ procStep: 1 }), 800),
+      setTimeout(() => this.setState({ procStep: 2 }), 1700),
+      setTimeout(() => this.setState({ procStep: 3 }), 2600),
+      setTimeout(() => this.setState({ signStep: 'success', signedAt: new Date(), juanSigned: true }), 3400),
+    ];
+  }
+  componentWillUnmount() { (this._t || []).forEach(clearTimeout); }
+  viewSigned() { this.setState({ activeDoc: 'verify', signStep: 'locate', rightTab: 'firmas' }); }
+  backToDoc() { this.setState({ signStep: 'locate' }); }
+
+  zIn() { this.setState(s => ({ signZoom: Math.min(1.6, +(s.signZoom + 0.2).toFixed(2)) })); }
+  zOut() { this.setState(s => ({ signZoom: Math.max(0.6, +(s.signZoom - 0.2).toFixed(2)) })); }
+  vzIn() { this.setState(s => ({ zoom: Math.min(1.6, +(s.zoom + 0.2).toFixed(2)) })); }
+  vzOut() { this.setState(s => ({ zoom: Math.max(0.6, +(s.zoom - 0.2).toFixed(2)) })); }
+  pgPrev() { this.setState(s => ({ vpage: Math.max(1, s.vpage - 1) })); }
+  pgNext() { this.setState(s => ({ vpage: Math.min(6, s.vpage + 1) })); }
+
+  setTab(t) { this.setState({ rightTab: t }); }
+  toggleExpand(i) { this.setState(s => ({ expanded: s.expanded === i ? null : i })); }
+  setAuditFilter(f) { this.setState({ auditFilter: f }); }
+  setMulti(m) { this.setState({ multiMode: m }); }
+  signAsCarlos() { this.setState({ carlosSigned: true }); }
+  setSigType(t) { this.setState({ sigType: t }); }
+
+  fmt(d) {
+    const p = n => String(n).padStart(2, '0');
+    return `${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()}, ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+  }
+  posLabel() {
+    const b = this.state.box; if (!b) return '—';
+    const cx = b.x + b.w / 2, cy = b.y + b.h / 2;
+    const v = cy < this.PAGE_H / 3 ? 'arriba' : cy > 2 * this.PAGE_H / 3 ? 'abajo' : 'centro';
+    const h = cx < this.PAGE_W / 3 ? 'izquierda' : cx > 2 * this.PAGE_W / 3 ? 'derecha' : 'centro';
+    return v === h ? v : `${v} ${h}`;
+  }
+
+  renderVals() {
+    const st = this.state;
+    const mob = st.view === 'mobile';
+    const onDoc = st.screen === 'doc';
+    const isSign = onDoc && st.activeDoc === 'sign';
+    const isVerify = onDoc && st.activeDoc === 'verify';
+    const isMulti = onDoc && st.activeDoc === 'multi';
+    const isViewer = isVerify || isMulti;
+    const b = st.box;
+
+    // ---- layout styles ----
+    const tab = (on) => `padding:6px 13px;border-radius:7px;font-size:12.5px;font-weight:600;border:none;${on ? 'background:#fff;color:#1d4ed8;box-shadow:0 1px 2px rgba(15,23,42,.08);' : 'background:transparent;color:#64748b;'}`;
+
+    const docMeta = [
+      { key: 'sign', name: 'Acuerdo_NDA_2026.pdf', status: 'Pendiente de firma', statusColor: '#ea580c', iconBg: '#fff7ed', iconBorder: '#fed7aa', iconText: '#ea580c' },
+      { key: 'verify', name: 'Contrato_Servicios.pdf', status: 'Firmado · válido', statusColor: '#16a34a', iconBg: '#f0fdf4', iconBorder: '#bbf7d0', iconText: '#16a34a' },
+      { key: 'multi', name: 'Convenio_Colaboracion.pdf', status: '2 firmas requeridas', statusColor: '#1d4ed8', iconBg: '#eff6ff', iconBorder: '#bfdbfe', iconText: '#1d4ed8' },
+    ];
+    const docs = docMeta.map(d => ({
+      ...d,
+      onClick: () => this.go(d.key),
+      style: `display:flex;align-items:center;gap:11px;width:100%;padding:10px;border-radius:10px;text-align:left;border:1px solid ${st.activeDoc === d.key ? '#bfdbfe' : 'transparent'};background:${st.activeDoc === d.key ? '#eff6ff' : 'transparent'};margin-bottom:4px;`,
+    }));
+
+    const bodyParas = [
+      'PRIMERA — Objeto. El presente Acuerdo de Confidencialidad regula las condiciones bajo las cuales las Partes intercambiarán información reservada en el marco de su relación comercial y profesional.',
+      'SEGUNDA — Información confidencial. Se considerará confidencial toda información técnica, comercial, financiera o de cualquier otra naturaleza que una Parte revele a la otra, ya sea de forma oral, escrita o por medios electrónicos.',
+      'TERCERA — Obligaciones. La Parte receptora se compromete a mantener la más estricta confidencialidad sobre la información recibida y a no divulgarla a terceros sin el consentimiento previo y por escrito de la Parte emisora.',
+      'CUARTA — Duración. Las obligaciones de confidencialidad permanecerán vigentes durante un periodo de cinco (5) años a contar desde la fecha de firma del presente documento.',
+      'QUINTA — Legislación aplicable. El presente Acuerdo se regirá e interpretará de conformidad con la legislación española y el Reglamento (UE) 910/2014 (eIDAS).',
+      'SEXTA — Jurisdicción. Para la resolución de cualquier controversia, las Partes se someten a los Juzgados y Tribunales de la ciudad de Madrid, con renuncia a cualquier otro fuero.',
+    ];
+
+    // ---- sign: box styles ----
+    const boxStyle = b
+      ? `position:absolute;left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px;border:2px dashed #1d4ed8;background:rgba(29,78,216,0.12);border-radius:4px;pointer-events:none;box-shadow:0 0 0 9999px rgba(15,23,42,0.04);`
+      : 'display:none;';
+    const showLabel = b && b.w >= 40 && b.h >= 20;
+    const boxLabelStyle = showLabel
+      ? `position:absolute;left:${b.x}px;top:${Math.max(0, b.y - 21)}px;background:#1d4ed8;color:#fff;font-size:10px;font-weight:600;padding:2px 7px;border-radius:5px 5px 5px 0;pointer-events:none;white-space:nowrap;`
+      : 'display:none;';
+    const coordsText = b
+      ? `${Math.round(b.w)}×${Math.round(b.h)} px · ${this.posLabel()}`
+      : 'Sin selección';
+
+    const nextBtnStyle = `display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:9px;font-size:13px;font-weight:700;${b ? 'background:#1d4ed8;color:#fff;cursor:pointer;' : 'background:#e2e8f0;color:#94a3b8;cursor:not-allowed;'}`;
+    const clearBtnStyle = `display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:9px;font-size:12.5px;font-weight:600;border:1px solid #e2e8f0;background:#fff;color:${b ? '#334155' : '#cbd5e1'};`;
+
+    // ---- verify signatures ----
+    const baseSigs = [
+      { name: 'María García López', email: 'maria.garcia@bufetegl.es', fp: 'A1:B2:9F:3C:7D:0E:44:8A', date: '26/06/2026, 09:14:32', tsa: '26/06/2026 09:14:33', serial: '2F:4A:1C:88:90:AB', issuer: 'AC FNMT Usuarios', valid: '14/02/2027', initials: 'MG', avatarBg: '#0891b2' },
+      { name: 'Juan Pérez García', email: 'juan.perez@bufetegl.es', fp: 'C4:D5:1A:77:2B:9E:60:3F', date: '26/06/2026, 11:48:05', tsa: '26/06/2026 11:48:06', serial: '7B:0D:3E:21:54:F2', issuer: 'AC FNMT Usuarios', valid: '14/03/2027', initials: 'JP', avatarBg: '#1d4ed8' },
+    ];
+    const verifySignatures = baseSigs.map((s, i) => ({
+      ...s, open: st.expanded === i, toggle: () => this.toggleExpand(i),
+      toggleLabel: st.expanded === i ? '▲ Ocultar detalles del certificado' : '▼ Ver detalles del certificado',
+    }));
+
+    const stamps = [
+      { name: 'María García López', date: '26/06/2026 09:14 UTC', x: 56, y: 600 },
+      { name: 'Juan Pérez García', date: '26/06/2026 11:48 UTC', x: 320, y: 600 },
+    ].map(s => ({ ...s, style: `position:absolute;left:${s.x}px;top:${s.y}px;width:184px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:8px;padding:8px 10px;` }));
+
+    // ---- audit ----
+    const allAudit = [
+      { time: '24/06/2026 16:02', event: 'Documento creado y subido', actor: 'Ana Ruiz (administradora)', type: 'info', icon: '📄', iconBg: '#f1f5f9', iconColor: '#475569' },
+      { time: '24/06/2026 16:05', event: 'Enviado a firmar a 2 destinatarios', actor: 'Ana Ruiz', type: 'info', icon: '✉', iconBg: '#f1f5f9', iconColor: '#475569' },
+      { time: '26/06/2026 09:14', event: 'Firma completada', actor: 'María García López', type: 'sign', icon: '✓', iconBg: '#dcfce7', iconColor: '#16a34a' },
+      { time: '26/06/2026 09:14', event: 'Sello de tiempo TSA aplicado', actor: 'tsa.izenpe.com', type: 'tsa', icon: '🕑', iconBg: '#eff6ff', iconColor: '#1d4ed8' },
+      { time: '26/06/2026 11:48', event: 'Firma completada', actor: 'Juan Pérez García', type: 'sign', icon: '✓', iconBg: '#dcfce7', iconColor: '#16a34a' },
+      { time: '26/06/2026 11:48', event: 'Sello de tiempo TSA aplicado', actor: 'tsa.izenpe.com', type: 'tsa', icon: '🕑', iconBg: '#eff6ff', iconColor: '#1d4ed8' },
+      { time: '26/06/2026 11:48', event: 'Documento sellado y finalizado', actor: 'Sistema', type: 'done', icon: '🔒', iconBg: '#f0fdf4', iconColor: '#16a34a' },
+    ];
+    const auditRows = allAudit.filter(r => st.auditFilter === 'todos' || r.type === st.auditFilter);
+    const chipDefs = [{ k: 'todos', l: 'Todos' }, { k: 'sign', l: 'Firmas' }, { k: 'tsa', l: 'Sellos TSA' }];
+    const auditChips = chipDefs.map(c => ({
+      label: c.l, onClick: () => this.setAuditFilter(c.k),
+      style: `padding:5px 11px;border-radius:999px;font-size:11.5px;font-weight:600;border:1px solid ${st.auditFilter === c.k ? '#1d4ed8' : '#e2e8f0'};background:${st.auditFilter === c.k ? '#1d4ed8' : '#fff'};color:${st.auditFilter === c.k ? '#fff' : '#475569'};`,
+    }));
+
+    // ---- multi ----
+    const seq = st.multiMode === 'sequential';
+    const carlos = st.carlosSigned;
+    const badge = (txt, ok) => `display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;font-size:10.5px;font-weight:600;background:${ok ? '#dcfce7' : '#fef3c7'};color:${ok ? '#15803d' : '#b45309'};`;
+    const signerCard = (name, sub, done, isCurrent, order, showLine) => ({
+      name, sub, showLine,
+      dotIcon: done ? '✓' : (seq ? String(order) : '●'),
+      dotBg: done ? '#16a34a' : '#fff', dotColor: done ? '#fff' : '#94a3b8',
+      dotBorder: done ? '#16a34a' : '#cbd5e1',
+      cardBg: done ? '#f0fdf4' : '#fff', cardBorder: done ? '#bbf7d0' : '#e2e8f0',
+      badge: done ? '✓ Firmado' : 'Pendiente', badgeStyle: badge('', done),
+      canSign: !done && isCurrent,
+    });
+    const multiSigners = [
+      signerCard('María García López', carlos || true ? 'Firmó hace 2 días' : '', true, false, 1, true),
+      signerCard('Carlos López Ruiz (tú)', carlos ? 'Firmó hace un momento' : (seq ? 'Desbloqueado · es tu turno' : 'Pendiente de tu firma'), carlos, !carlos, 2, false),
+    ];
+    const multiTitle = seq ? (carlos ? 'Firma secuencial · completada' : 'Firma secuencial · 1 de 2') : (carlos ? '2 de 2 firmas completadas' : '2 firmas requeridas');
+    const multiSubtitle = seq ? 'Cada firmante firma en orden establecido.' : 'Los firmantes pueden firmar en cualquier orden.';
+    const multiMsg = carlos ? '✓ Todas las firmas se han completado. El documento está sellado.' : (seq ? 'Es tu turno: María García ya firmó. Pulsa “Firmar ahora”.' : 'Falta tu firma para completar el documento.');
+    const multiMsgStyle = `margin-top:6px;background:${carlos ? '#f0fdf4' : '#fff7ed'};border:1px solid ${carlos ? '#bbf7d0' : '#fed7aa'};color:${carlos ? '#15803d' : '#b45309'};border-radius:10px;padding:11px 13px;font-size:12px;font-weight:500;line-height:1.5;`;
+
+    // ---- processing ----
+    const ps = st.procStep;
+    const procLabels = ['Validando certificado del firmante', 'Obteniendo sello de tiempo (TSA)', 'Generando firma digital PAdES'];
+    const procView = procLabels.map((label, i) => {
+      const done = ps > i, active = ps === i, pending = ps < i;
+      return {
+        label, done, active, pending,
+        iconStyle: `width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;background:${done ? '#16a34a' : active ? '#eff6ff' : '#f1f5f9'};color:#fff;`,
+        labelStyle: `font-size:13px;font-weight:${active || done ? 600 : 400};color:${done ? '#0f172a' : active ? '#1d4ed8' : '#94a3b8'};`,
+      };
+    });
+    const progressStyle = `height:100%;width:${(ps / 3 * 100)}%;background:#1d4ed8;border-radius:99px;transition:width .5s ease;`;
+
+    // ---- sig type buttons ----
+    const sigBtn = (on) => `flex:1;padding:10px;border-radius:9px;font-size:12px;font-weight:600;border:1.5px solid ${on ? '#1d4ed8' : '#e2e8f0'};background:${on ? '#eff6ff' : '#fff'};color:${on ? '#1d4ed8' : '#64748b'};`;
+
+    // ---- nav ----
+    const navStyle = (on) => `display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border-radius:9px;text-align:left;font-size:12.5px;font-weight:600;color:${on ? '#1d4ed8' : '#475569'};background:${on ? '#eff6ff' : 'transparent'};border:1px solid ${on ? '#bfdbfe' : 'transparent'};`;
+
+    // ---- cert picker ----
+    const certs = [
+      { cn: 'Juan Pérez García', issuer: 'FNMT-RCM · AC FNMT Usuarios', detail: 'NIF 12345678Z · válido hasta 14/03/2027' },
+      { cn: 'Juan Pérez García (DNIe)', issuer: 'Dirección General de la Policía', detail: 'DNI electrónico · válido hasta 02/2028' },
+    ].map((c, i) => ({ ...c, sel: st.selectedCert === i, pick: () => this.pickCert(i), rowStyle: `display:flex;align-items:center;gap:12px;padding:12px 13px;border-radius:10px;cursor:pointer;border:1.5px solid ${st.selectedCert === i ? '#1d4ed8' : '#e2e8f0'};background:${st.selectedCert === i ? '#eff6ff' : '#fff'};margin-bottom:8px;`, dotStyle: `width:16px;height:16px;border-radius:50%;border:2px solid ${st.selectedCert === i ? '#1d4ed8' : '#cbd5e1'};display:flex;align-items:center;justify-content:center;flex-shrink:0;`, dotInner: st.selectedCert === i ? 'width:8px;height:8px;border-radius:50%;background:#1d4ed8;' : 'display:none;' }));
+
+    // ---- users ----
+    const userDir = [
+      { id: 'u1', name: 'María García López', email: 'maria.garcia@bufetegl.es', role: 'Socia directora', initials: 'MG', bg: '#0891b2' },
+      { id: 'u2', name: 'Carlos López Ruiz', email: 'carlos.lopez@bufetegl.es', role: 'Abogado', initials: 'CL', bg: '#7c3aed' },
+      { id: 'u3', name: 'Ana Ruiz Méndez', email: 'ana.ruiz@bufetegl.es', role: 'Administración', initials: 'AR', bg: '#db2777' },
+      { id: 'u4', name: 'Javier Soto Marín', email: 'javier.soto@cliente.com', role: 'Cliente externo', initials: 'JS', bg: '#ea580c' },
+      { id: 'u5', name: 'Lucía Navarro Gil', email: 'lucia.navarro@cliente.com', role: 'Cliente externo', initials: 'LN', bg: '#16a34a' },
+    ];
+    const q = st.userSearch.trim().toLowerCase();
+    const userRows = userDir.filter(u => !q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)).map(u => {
+      const sel = st.selectedSigners.includes(u.id);
+      return { ...u, sel, toggle: () => this.toggleSigner(u.id), btnLabel: sel ? '✓ Añadido' : '+ Añadir', btnStyle: `padding:7px 13px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid ${sel ? '#bbf7d0' : '#1d4ed8'};background:${sel ? '#f0fdf4' : '#1d4ed8'};color:${sel ? '#15803d' : '#fff'};` };
+    });
+    const selectedUsers = st.selectedSigners.map((id, i) => {
+      const u = userDir.find(x => x.id === id);
+      return u ? { ...u, order: i + 1, remove: () => this.toggleSigner(id) } : null;
+    }).filter(Boolean);
+    const usersSeq = st.signMode === 'sequential';
+
+    // ---- profile ----
+    const radioBtn = (on) => `flex:1;padding:11px;border-radius:9px;font-size:12.5px;font-weight:600;border:1.5px solid ${on ? '#1d4ed8' : '#e2e8f0'};background:${on ? '#eff6ff' : '#fff'};color:${on ? '#1d4ed8' : '#64748b'};`;
+    const profTab = (on) => `padding:9px 4px;font-size:13px;font-weight:600;border:none;background:none;color:${on ? '#1d4ed8' : '#94a3b8'};border-bottom:2px solid ${on ? '#1d4ed8' : 'transparent'};margin-bottom:-1px;`;
+    const toggleSw = (on) => `width:42px;height:24px;border-radius:999px;background:${on ? '#1d4ed8' : '#cbd5e1'};position:relative;transition:background .2s;flex-shrink:0;`;
+    const toggleKnob = (on) => `position:absolute;top:2px;left:${on ? '20px' : '2px'};width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 2px rgba(0,0,0,.2);`;
+
+    return {
+      // flags
+      isSign, isVerify, isMulti, isViewer,
+      isReview: isSign && st.signStep === 'review',
+      isProcessing: isSign && st.signStep === 'processing',
+      isSuccess: isSign && st.signStep === 'success',
+      isFirmasTab: st.rightTab === 'firmas',
+      isAuditTab: st.rightTab === 'auditoria',
+
+      // layout
+      outerStyle: mob ? 'min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#dfe4ea;' : 'min-height:100vh;display:flex;background:#dfe4ea;',
+      shellStyle: mob
+        ? 'position:relative;width:402px;height:812px;border-radius:42px;background:#f8fafc;display:flex;flex-direction:column;overflow:hidden;border:11px solid #0f172a;box-shadow:0 30px 70px rgba(0,0,0,.35);'
+        : 'position:relative;width:100%;min-height:100vh;background:#f8fafc;display:flex;flex-direction:column;overflow:hidden;',
+      bodyRowStyle: mob ? 'flex:1;display:flex;flex-direction:column;min-height:0;' : 'flex:1;display:flex;min-height:0;',
+      sidebarStyle: mob
+        ? 'display:flex;flex-direction:row;gap:8px;overflow-x:auto;padding:10px;background:#fff;border-bottom:1px solid #e2e8f0;flex-shrink:0;'
+        : 'width:252px;flex-shrink:0;background:#fff;border-right:1px solid #e2e8f0;display:flex;flex-direction:column;padding:14px 10px;',
+      sidebarLabelStyle: mob ? 'display:none;' : 'font-size:11px;font-weight:700;color:#94a3b8;letter-spacing:0.06em;text-transform:uppercase;padding:4px 8px 10px;',
+      mainStyle: mob ? 'flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;' : 'flex:1;display:flex;min-width:0;overflow:hidden;',
+      contentRowStyle: mob ? 'flex:1;display:flex;flex-direction:column;min-height:0;overflow:auto;' : 'flex:1;display:flex;min-width:0;',
+      pdfPaneStyle: mob ? 'display:flex;flex-direction:column;flex-shrink:0;min-height:540px;border-bottom:1px solid #e2e8f0;' : 'flex:1;display:flex;flex-direction:column;min-width:0;',
+      rightPaneStyle: mob ? 'display:flex;flex-direction:column;background:#fff;border-top:1px solid #e2e8f0;' : 'width:360px;flex-shrink:0;background:#fff;border-left:1px solid #e2e8f0;display:flex;flex-direction:column;',
+
+      deskTabStyle: tab(!mob), mobTabStyle: tab(mob),
+      setDesktop: () => this.setView('desktop'), setMobile: () => this.setView('mobile'),
+
+      docs, bodyParas,
+
+      // sign
+      signPage: st.signPage,
+      signZoomPct: Math.round(st.signZoom * 100) + '%',
+      pageWrapStyle: `transform:scale(${st.signZoom});transform-origin:top center;flex-shrink:0;height:fit-content;`,
+      onPageDown: (e) => this.onPageDown(e),
+      onPageMove: (e) => this.onPageMove(e),
+      onPageUp: () => this.endDraw(),
+      boxStyle, boxLabelStyle, coordsText,
+      boxLabel: 'Área de firma',
+      clearBox: () => this.clearBox(), next: () => this.next(),
+      nextBtnStyle, clearBtnStyle,
+      zIn: () => this.zIn(), zOut: () => this.zOut(),
+
+      // review
+      posLabel: this.posLabel(),
+      cancelReview: () => this.cancelReview(), confirmSign: () => this.confirmSign(),
+      setSigAvanzada: () => this.setSigType('avanzada'), setSigCualificada: () => this.setSigType('cualificada'),
+      avanzadaStyle: sigBtn(st.sigType === 'avanzada'), cualificadaStyle: sigBtn(st.sigType === 'cualificada'),
+
+      // processing
+      procView, progressStyle,
+
+      // success
+      signedAtStr: st.signedAt ? this.fmt(st.signedAt) : '—',
+      signedTsaStr: st.signedAt ? this.fmt(st.signedAt) + ' UTC' : '—',
+      backToDoc: () => this.backToDoc(), viewSigned: () => this.viewSigned(),
+
+      // viewer
+      vpage: st.vpage, vZoomPct: Math.round(st.zoom * 100) + '%',
+      vPageWrapStyle: `transform:scale(${st.zoom});transform-origin:top center;flex-shrink:0;height:fit-content;`,
+      vzIn: () => this.vzIn(), vzOut: () => this.vzOut(),
+      pgPrev: () => this.pgPrev(), pgNext: () => this.pgNext(),
+      viewerDocCode: isVerify ? 'CONTRATO_SERVICIOS.PDF · FIRMADO' : 'CONVENIO_COLABORACION.PDF',
+      viewerDocTitle: isVerify ? 'CONTRATO DE PRESTACIÓN DE SERVICIOS' : 'CONVENIO DE COLABORACIÓN',
+      stamps: isVerify ? stamps : [],
+
+      // verify panel
+      tabFirmas: () => this.setTab('firmas'), tabAudit: () => this.setTab('auditoria'),
+      tabFirmasStyle: `padding:9px 4px;font-size:12.5px;font-weight:600;border:none;background:none;color:${st.rightTab === 'firmas' ? '#1d4ed8' : '#94a3b8'};border-bottom:2px solid ${st.rightTab === 'firmas' ? '#1d4ed8' : 'transparent'};margin-bottom:-1px;`,
+      tabAuditStyle: `padding:9px 4px;font-size:12.5px;font-weight:600;border:none;background:none;color:${st.rightTab === 'auditoria' ? '#1d4ed8' : '#94a3b8'};border-bottom:2px solid ${st.rightTab === 'auditoria' ? '#1d4ed8' : 'transparent'};margin-bottom:-1px;`,
+      verifySignatures, auditRows, auditChips,
+
+      // multi panel
+      setParallel: () => this.setMulti('parallel'), setSequential: () => this.setMulti('sequential'),
+      parTabStyle: tab(st.multiMode === 'parallel'), seqTabStyle: tab(st.multiMode === 'sequential'),
+      multiSigners, multiTitle, multiSubtitle, multiMsg, multiMsgStyle,
+      signAsCarlos: () => this.signAsCarlos(),
+
+      // auth + screens
+      authed: st.authed, notAuthed: !st.authed, certPicker: st.certPicker,
+      isUpload: st.screen === 'upload', isUsers: st.screen === 'users', isProfile: st.screen === 'profile',
+      openCertPicker: () => this.openCertPicker(), confirmCert: () => this.confirmCert(), cancelCert: () => this.cancelCert(),
+      logout: () => this.logout(),
+      certs,
+      goUpload: () => this.goScreen('upload'), goUsers: () => this.goScreen('users'), goProfile: () => this.goScreen('profile'),
+      navUploadStyle: navStyle(st.screen === 'upload'),
+      navUsersStyle: navStyle(st.screen === 'users'),
+      navProfileStyle: navStyle(st.screen === 'profile'),
+
+      // upload
+      uploadEmpty: st.uploadState === 'empty', uploadReady: st.uploadState === 'ready',
+      pickFile: () => this.pickFile(), resetUpload: () => this.resetUpload(), uploadContinue: () => this.uploadContinue(),
+
+      // users
+      userSearch: st.userSearch,
+      onUserSearch: (e) => this.setUserSearch(e.target.value),
+      userRows, selectedUsers, selectedCount: st.selectedSigners.length,
+      usersSeq,
+      usersParStyle: tab(st.signMode === 'parallel'), usersSeqStyle: tab(st.signMode === 'sequential'),
+      setUsersParallel: () => this.setSignMode('parallel'), setUsersSequential: () => this.setSignMode('sequential'),
+
+      // profile
+      isProfTabPerfil: st.profileTab === 'perfil', isProfTabCert: st.profileTab === 'certificado', isProfTabPref: st.profileTab === 'preferencias',
+      tabPerfil: () => this.setProfileTab('perfil'), tabCert: () => this.setProfileTab('certificado'), tabPref: () => this.setProfileTab('preferencias'),
+      profTabPerfilStyle: profTab(st.profileTab === 'perfil'), profTabCertStyle: profTab(st.profileTab === 'certificado'), profTabPrefStyle: profTab(st.profileTab === 'preferencias'),
+      sigAvanzadaPrefStyle: radioBtn(st.defaultSigType === 'avanzada'), sigCualPrefStyle: radioBtn(st.defaultSigType === 'cualificada'),
+      setPrefAvanzada: () => this.setDefaultSig('avanzada'), setPrefCual: () => this.setDefaultSig('cualificada'),
+      langEsStyle: radioBtn(st.lang === 'es'), langCaStyle: radioBtn(st.lang === 'ca'), langEnStyle: radioBtn(st.lang === 'en'),
+      setLangEs: () => this.setLang('es'), setLangCa: () => this.setLang('ca'), setLangEn: () => this.setLang('en'),
+      notifEmail: st.notifEmail, notifSms: st.notifSms,
+      emailSwStyle: toggleSw(st.notifEmail), emailKnobStyle: toggleKnob(st.notifEmail),
+      smsSwStyle: toggleSw(st.notifSms), smsKnobStyle: toggleKnob(st.notifSms),
+      toggleEmail: () => this.toggleNotif('notifEmail'), toggleSms: () => this.toggleNotif('notifSms'),
+    };
+  }
+}
+</script>
+</body>
+</html>
