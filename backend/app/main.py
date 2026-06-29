@@ -15,7 +15,7 @@ from fastapi.responses import JSONResponse
 from app.config import settings
 from app.database import init_db
 from app.middleware import AuthMiddleware, SecurityHeadersMiddleware
-from app.routes import auth, documents, signatures
+from app.routes import audit, auth, documents, signatures, users, workflows
 from app.utils.errors import ApiError
 from app.utils.logger import logger
 
@@ -61,6 +61,9 @@ async def api_error_handler(request: Request, exc: ApiError) -> JSONResponse:
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
 app.include_router(documents.router, prefix="/api/v1/documents", tags=["documents"])
 app.include_router(signatures.router, prefix="/api/v1/documents", tags=["signatures"])
+app.include_router(workflows.router, prefix="/api/v1/documents", tags=["workflows"])
+app.include_router(users.router, prefix="/api/v1/users", tags=["users"])
+app.include_router(audit.router, prefix="/api/v1", tags=["audit"])
 
 
 @app.get("/health")

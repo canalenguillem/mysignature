@@ -11,11 +11,12 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends, File, Form, Query, UploadFile
+from fastapi import APIRouter, Depends, File, Form, Query, Request, UploadFile
 from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
 from app.database.connection import get_db
+from app.services.audit_service import AuditService
 from app.models.document import Document
 from app.models.user import User
 from app.schemas.document import (
@@ -95,6 +96,7 @@ def _to_detail(doc: Document) -> DocumentDetail:
 # ---------- endpoints ----------
 @router.post("", response_model=DocumentUploadResponse, status_code=201)
 async def upload_document(
+    request: Request,
     file: UploadFile = File(...),
     title: str = Form(...),
     description: Optional[str] = Form(None),
@@ -110,6 +112,11 @@ async def upload_document(
         original_filename=file.filename or "document.pdf",
         description=description,
         content_type=file.content_type,
+    )
+    await AuditService.log_action(
+        db, "DOCUMENT_UPLOADED", current_user.id, "document", document.id, request,
+        actor_cert_fingerprint=current_user.cert_fingerprint,
+        details={"filename": document.original_filename, "size": document.file_size},
     )
     return DocumentUploadResponse(
         id=document.id,
@@ -175,9 +182,14 @@ async def download_document(
 @router.delete("/{document_id}", response_model=DocumentDeleteResponse)
 async def delete_document(
     document_id: str,
+    request: Request,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> DocumentDeleteResponse:
     document = DocumentService.get_document(db, document_id)
     DocumentService.delete_document(db, document)
+    await AuditService.log_action(
+        db, "DOCUMENT_DELETED", current_user.id, "document", document_id, request,
+        actor_cert_fingerprint=current_user.cert_fingerprint,
+    )
     return DocumentDeleteResponse(id=document_id)

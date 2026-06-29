@@ -23,6 +23,13 @@ from app.schemas.auth import (
     RefreshResponse,
     UserPublic,
 )
+from app.schemas.workflow import (
+    PendingCreatedBy,
+    PendingSignatureItem,
+    PendingSignaturesResponse,
+    PendingWorkflowInfo,
+)
+from app.services.workflow_service import WorkflowService
 from app.security.jwt_handler import (
     create_access_token,
     create_refresh_token,
@@ -85,3 +92,34 @@ async def logout(current_user: User = Depends(get_current_user)) -> LogoutRespon
 async def me(current_user: User = Depends(get_current_user)) -> MeResponse:
     """Devuelve la información del usuario autenticado."""
     return MeResponse.model_validate(current_user)
+
+
+@router.get("/my-pending-signatures", response_model=PendingSignaturesResponse)
+async def my_pending_signatures(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> PendingSignaturesResponse:
+    """Documentos con una firma pendiente del usuario actual."""
+    pending = WorkflowService.get_pending_for_user(db, current_user)
+    items = []
+    for p in pending:
+        wf, doc = p["workflow"], p["document"]
+        creator = wf.document.owner if wf.document else None
+        items.append(
+            PendingSignatureItem(
+                document_id=doc.id,
+                title=doc.title,
+                created_by=PendingCreatedBy(
+                    first_name=creator.first_name if creator else None,
+                    last_name=creator.last_name if creator else None,
+                ),
+                created_at=doc.created_at,
+                workflow=PendingWorkflowInfo(
+                    workflow_id=wf.id,
+                    type=wf.sequence_type,
+                    completed_signers=wf.completed_signers,
+                    required_signers=wf.required_signers,
+                ),
+            )
+        )
+    return PendingSignaturesResponse(total=len(items), pending_signatures=items)

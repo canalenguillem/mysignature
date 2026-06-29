@@ -14,7 +14,9 @@ from typing import Optional
 from sqlalchemy.orm import Session
 from starlette.requests import Request
 
-from app.models.audit_log import AuditLog
+from sqlalchemy import desc
+
+from app.models.audit_log import AuditEvent, AuditLog
 from app.utils.logger import logger
 
 
@@ -58,3 +60,44 @@ class AuditService:
         except Exception as exc:  # noqa: BLE001 — auditoría nunca debe tumbar el flujo
             db.rollback()
             logger.error("No se pudo escribir audit_log (%s): %s", action, exc)
+
+    # ----- lectura -----
+    @staticmethod
+    def list_for_document(
+        db: Session,
+        document_id: str,
+        action: Optional[str] = None,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> dict:
+        q = db.query(AuditLog).filter(
+            AuditLog.resource_type == "document",
+            AuditLog.resource_id == document_id,
+        )
+        if action:
+            q = q.filter(AuditLog.action == action)
+        total = q.count()
+        items = q.order_by(desc(AuditLog.timestamp)).limit(limit).offset(offset).all()
+        return {"total": total, "limit": limit, "offset": offset, "audit_logs": items}
+
+    @staticmethod
+    def list_events(
+        db: Session,
+        event_type: Optional[str] = None,
+        severity: Optional[str] = None,
+        date_from: Optional[datetime] = None,
+        date_to: Optional[datetime] = None,
+        limit: int = 100,
+    ) -> dict:
+        q = db.query(AuditEvent)
+        if event_type:
+            q = q.filter(AuditEvent.event_type == event_type)
+        if severity:
+            q = q.filter(AuditEvent.severity == severity)
+        if date_from:
+            q = q.filter(AuditEvent.timestamp >= date_from)
+        if date_to:
+            q = q.filter(AuditEvent.timestamp <= date_to)
+        total = q.count()
+        items = q.order_by(desc(AuditEvent.timestamp)).limit(limit).all()
+        return {"total": total, "events": items}

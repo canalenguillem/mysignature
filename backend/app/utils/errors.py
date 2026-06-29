@@ -88,3 +88,14 @@ class CertificateInvalidError(ApiError):
 class TSAUnavailableError(ApiError):
     status_code = 503
     error_code = "TSA_UNAVAILABLE"
+
+
+# ===== Workflows (docs/API_SPEC.md §4) =====
+class InvalidSignerError(ApiError):
+    status_code = 400
+    error_code = "INVALID_SIGNER"
+
+
+class WorkflowExistsError(ApiError):
+    status_code = 409
+    error_code = "WORKFLOW_EXISTS"
