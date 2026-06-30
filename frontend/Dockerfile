@@ -3,8 +3,9 @@ FROM node:18-alpine as dev
 
 WORKDIR /app
 
-COPY package*.json .
-RUN npm ci
+# npm install (no npm ci): el lockfile se genera en la primera instalación.
+COPY package*.json ./
+RUN npm install
 
 COPY . .
 
@@ -19,8 +20,8 @@ WORKDIR /app
 
 ARG VITE_API_URL
 
-COPY package*.json .
-RUN npm ci
+COPY package*.json ./
+RUN npm install
 
 COPY . .
 

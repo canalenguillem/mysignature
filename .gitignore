@@ -17,6 +17,10 @@ venv/
 node_modules/
 dist/
 *.local
+# Artefactos de tsc -b (build incremental + emisión de la config)
+*.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
 
 # ===== Certificados / Secretos =====
 certs/

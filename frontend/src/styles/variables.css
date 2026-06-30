@@ -1,0 +1,36 @@
+/* Design tokens — handoff «Plataforma Firma EIDAS» */
+:root {
+  /* Marca / azul */
+  --primary: #1d4ed8;
+  --primary-dark: #1e40af;
+  --primary-tint: #eff6ff;
+  --primary-border: #bfdbfe;
+
+  /* Estados */
+  --success: #16a34a;
+  --success-tint: #f0fdf4;
+  --success-tint-2: #dcfce7;
+  --success-border: #bbf7d0;
+  --success-text: #15803d;
+  --warning: #ea580c;
+  --warning-tint: #fff7ed;
+  --warning-border: #fed7aa;
+  --warning-text: #b45309;
+  --error: #dc2626;
+
+  /* Texto */
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --text-faint: #94a3b8;
+
+  /* Superficies */
+  --bg-app: #f8fafc;
+  --bg-canvas: #475569;
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  --border-faint: #f1f5f9;
+
+  /* Tipografía */
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+}
